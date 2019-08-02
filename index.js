@@ -305,9 +305,12 @@ if (!fs.existsSync(out_file))
   }
 
   async function flip_review_pager_action(page) {
-    await page.waitForFunction(() => {
-      return jQuery(".paging").children("button.arrow-button").length === 2;
-    });
+    await page.waitForFunction(
+      () => {
+        return jQuery(".paging").children("button.arrow-button").length === 2;
+      },
+      { timeout: 90000 }
+    );
     const no_more = await page.evaluate(() => {
       const no_more = jQuery(".paging")
         .children("button.arrow-button")
