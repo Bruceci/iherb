@@ -9,6 +9,7 @@ const args = [
   "--window-position=0,0",
   "--ignore-certificate-errors",
   "--ignore-certificate-errors-spki-list",
+  "--disable-extensions",
   "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 ];
 
@@ -19,7 +20,6 @@ module.exports = puppeteer
     executablePath: chrome_driver,
     headless: true,
     defaultViewport: null,
-    dumpio: true,
     args: args
   })
   .then(async browser => {

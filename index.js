@@ -159,11 +159,14 @@ if (!fs.existsSync(out_file))
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 200000 });
 
-    await page.waitForFunction(() => {
-      return jQuery(".product-description-title")
-        .last()
-        .find(".rating-count").length;
-    });
+    await page.waitForFunction(
+      () => {
+        return jQuery(".product-description-title")
+          .last()
+          .find(".rating-count").length;
+      },
+      { timeout: 90000 }
+    );
     const product = await page.evaluate(url => {
       const brand = jQuery("#brand")
         .find("span[itemprop=name]")
