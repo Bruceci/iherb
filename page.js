@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(pluginStealth());
+const chrome_driver = process.env["CHROME_DRIVER"];
 const args = [
   "--no-sandbox",
   "--disable-setuid-sandbox",
@@ -15,9 +16,8 @@ module.exports = puppeteer
   .launch({
     ignoreHTTPSErrors: true,
     userDataDir: "./tmp1",
-    executablePath:
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    headless: false,
+    executablePath: chrome_driver,
+    headless: true,
     defaultViewport: null,
     args: args
   })
