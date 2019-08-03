@@ -120,7 +120,7 @@ if (!fs.existsSync(out_file))
   }
 
   async function get_category_urls(page, url) {
-    await page.goto(url, { timeout: 200000 });
+    await page.goto(url, { timeout: 90003 });
     await change_location(page);
     const urls = await page.evaluate(() => {
       return jQuery(".nav-item-list")
@@ -139,7 +139,7 @@ if (!fs.existsSync(out_file))
   }
 
   async function get_product_list_one_page(page, url) {
-    await page.goto(url, { timeout: 200000 });
+    await page.goto(url, { timeout: 90004 });
     const urls = await page.evaluate(() => {
       return jQuery(".products")
         .children(".product")
@@ -175,7 +175,7 @@ if (!fs.existsSync(out_file))
     const page = await browser.newPage();
     await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
-    await page.goto(url, { timeout: 200000 });
+    await page.goto(url, { timeout: 90005 });
 
     await page.waitForFunction(
       () => {
@@ -183,7 +183,7 @@ if (!fs.existsSync(out_file))
           .last()
           .find(".rating-count").length;
       },
-      { timeout: 90000 }
+      { timeout: 90006 }
     );
     const product = await page.evaluate(url => {
       const brand = jQuery("#brand")
@@ -268,13 +268,24 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_review(page, url) {
     if (!url) return [];
-    await page.goto(url, { timeout: 200000 });
+    try {
+      await page.goto(url, { timeout: 9007 });
+    } catch (ex) {
+      console.log("product page time out error, reload");
+      await grab_product_review(page, url);
+    }
+
     let reviews = [];
     while (true) {
       let ret = await grab_product_review_one_page(page);
       reviews = reviews.concat(ret);
-      if ((await flip_review_pager_action(page)) == true) {
-        break;
+      try {
+        if ((await flip_review_pager_action(page)) == true) {
+          break;
+        }
+      } catch (ex) {
+        console.log("flip error, reload");
+        await grab_product_review(page, url);
       }
     }
     return reviews;
@@ -349,7 +360,7 @@ if (!fs.existsSync(out_file))
         () => {
           return jQuery("div.loader").length == 0;
         },
-        { timeout: 90000 }
+        { timeout: 90001 }
       );
     }
     return no_more;
@@ -379,7 +390,7 @@ if (!fs.existsSync(out_file))
       await page.waitForSelector(".country-column > .save-selection");
 
       page.click(".country-column > .save-selection");
-      await page.waitForNavigation({ timeout: 90000 });
+      await page.waitForNavigation({ timeout: 90002 });
     }
     console.log("change location end");
   }
