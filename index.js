@@ -176,15 +176,21 @@ if (!fs.existsSync(out_file))
     await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 90005 });
+    try {
+      await page.waitForFunction(
+        () => {
+          return jQuery(".product-description-title")
+            .last()
+            .find(".rating-count").length;
+        },
+        { timeout: 90006 }
+      );
+    } catch (ex) {
+      await page.close();
+      console.log(url);
+      await grab_product_detail(browser, url);
+    }
 
-    await page.waitForFunction(
-      () => {
-        return jQuery(".product-description-title")
-          .last()
-          .find(".rating-count").length;
-      },
-      { timeout: 90006 }
-    );
     const product = await page.evaluate(url => {
       const brand = jQuery("#brand")
         .find("span[itemprop=name]")
@@ -271,7 +277,8 @@ if (!fs.existsSync(out_file))
     try {
       await page.goto(url, { timeout: 9007 });
     } catch (ex) {
-      console.log("product page time out error, reload");
+      console.log("review page time out error, reload");
+      console.log(url);
       await grab_product_review(page, url);
     }
 
@@ -285,6 +292,7 @@ if (!fs.existsSync(out_file))
         }
       } catch (ex) {
         console.log("flip error, reload");
+        console.log(url);
         await grab_product_review(page, url);
       }
     }
@@ -368,13 +376,21 @@ if (!fs.existsSync(out_file))
 
   async function change_location(page) {
     console.log("change location");
-    const flag = await page.evaluate(() => {
-      return jQuery(".country-select > .country-code-flag")
-        .text()
-        .trim();
+    const is_us = await page.evaluate(() => {
+      return (
+        jQuery(".country-select")
+          .text()
+          .trim() == "US" &&
+        jQuery(".language-select")
+          .text()
+          .trim() == "EN" &&
+        jQuery(".currency-select")
+          .text()
+          .trim() == "USD"
+      );
     });
-    if (flag != "US") {
-      console.log(flag);
+    if (!is_us) {
+      console.log("changing language");
       await page.click(".country-select");
       await page.waitFor(2000);
       await page.waitForSelector(".select-country > .search-input");
@@ -386,9 +402,13 @@ if (!fs.existsSync(out_file))
       ))[0];
       await option_us.click();
 
-      await page.waitFor(1000);
+      await page.waitForFunction(() => {
+        return (
+          jQuery("#CurrentLanguageCode").attr("value") == "en-US" &&
+          jQuery("#CurrentCurrencyCode").attr("value") == "USD"
+        );
+      });
       await page.waitForSelector(".country-column > .save-selection");
-
       page.click(".country-column > .save-selection");
       await page.waitForNavigation({ timeout: 90002 });
     }
