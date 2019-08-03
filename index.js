@@ -305,16 +305,8 @@ if (!fs.existsSync(out_file))
   }
 
   async function grab_product_review(page, url) {
-    if (!url)
-      return [
-        {
-          title: "",
-          posted_date: "",
-          review_stars: "",
-          review_text: "",
-          helpful: ""
-        }
-      ];
+    let reviews = [];
+    if (!url) return reviews;
     try {
       await page.goto(url, { timeout: 90007 });
     } catch (ex) {
@@ -322,8 +314,15 @@ if (!fs.existsSync(out_file))
       console.log(url);
       await grab_product_review(page, url);
     }
+    const empty_review = await page.evaluate(() => {
+      return jQuery("div.empty-reviews-section").length;
+    });
+    if (empty_review) {
+      console.log("empty review");
+      console.log(url);
+      return reviews;
+    }
 
-    let reviews = [];
     while (true) {
       let ret = await grab_product_review_one_page(page);
       reviews = reviews.concat(ret);
@@ -341,7 +340,14 @@ if (!fs.existsSync(out_file))
   }
 
   async function grab_product_review_one_page(page) {
-    await page.waitForSelector(".reviews-list");
+    try {
+      await page.waitForSelector(".reviews-list", { timeout: 90008 });
+    } catch (ex) {
+      console.log("reviews list timeout rewati");
+      console.log(page.url());
+      await grab_product_reviconew_one_page(page);
+    }
+
     const ret = await page.evaluate(() => {
       return jQuery(".reviews-list")
         .children(".review-row")
