@@ -305,7 +305,15 @@ if (!fs.existsSync(out_file))
   }
 
   async function grab_product_review(page, url) {
-    let reviews = [];
+    let reviews = [
+      {
+        title: "",
+        posted_date: "",
+        review_stars: "",
+        review_text: "",
+        helpful: ""
+      }
+    ];
     if (!url) return reviews;
     try {
       await page.goto(url, { timeout: 90007 });
@@ -322,7 +330,7 @@ if (!fs.existsSync(out_file))
       console.log(url);
       return reviews;
     }
-
+    reviews = [];
     while (true) {
       let ret = await grab_product_review_one_page(page);
       reviews = reviews.concat(ret);
