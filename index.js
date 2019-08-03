@@ -100,6 +100,9 @@ if (!fs.existsSync(out_file))
   }
 
   async function page_set(page) {
+    await page.waitForFunction(() => {
+      return typeof jQuery === "function";
+    });
     await page.setRequestInterception(true);
     page.on("request", interceptedRequest => {
       if (
@@ -186,7 +189,6 @@ if (!fs.existsSync(out_file))
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
     await page_set(page);
-    await page.setViewport({ width: 1920, height: 1080 });
     try {
       await page.goto(url, { timeout: 90005 });
     } catch (ex) {
