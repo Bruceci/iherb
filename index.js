@@ -181,6 +181,7 @@ if (!fs.existsSync(out_file))
     await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 90005 });
+    let has_review = true;
     try {
       await page.waitForFunction(
         () => {
@@ -193,9 +194,41 @@ if (!fs.existsSync(out_file))
     } catch (ex) {
       console.log("no review, pass to next...");
       console.log(url);
+      has_review = false;
+    }
+    let product_part1 = {
+      product_stars: "",
+      reviews_count: "",
+      review_url: ""
+    };
+    if (has_review) {
+      product_part1 = await page.evaluate(() => {
+        const product_stars = parseFloat(
+          jQuery(".product-description-title")
+            .last()
+            .find(".stars-rating")
+            .attr("class")
+            .replace(/.*icon-stars_([\d]+).*/, `$1`)
+            .replace(/5$/, ".5")
+            .replace(/0/, "")
+        );
+
+        const reviews_count = parseInt(
+          jQuery(".product-description-title")
+            .last()
+            .find(".rating-count > span")
+            .text()
+            .trim()
+        );
+        const review_url = jQuery(".product-description-title")
+          .last()
+          .find(".rating-count")
+          .attr("href");
+        return { product_stars, reviews_count, review_url };
+      });
     }
 
-    const product = await page.evaluate(url => {
+    const product_part2 = await page.evaluate(url => {
       const brand = jQuery("#brand")
         .find("span[itemprop=name]")
         .text()
@@ -229,27 +262,8 @@ if (!fs.existsSync(out_file))
         .text()
         .trim();
       const image = jQuery("#iherb-product-image").attr("src");
-      const product_stars = parseFloat(
-        jQuery(".product-description-title")
-          .last()
-          .find(".stars-rating")
-          .attr("class")
-          .replace(/.*icon-stars_([\d]+).*/, `$1`)
-          .replace(/5$/, ".5")
-          .replace(/0/, "")
-      );
-      const reviews_count = parseInt(
-        jQuery(".product-description-title")
-          .last()
-          .find(".rating-count > span")
-          .text()
-          .trim()
-      );
+
       const product_url = url;
-      const review_url = jQuery(".product-description-title")
-        .last()
-        .find(".rating-count")
-        .attr("href");
 
       return {
         brand,
@@ -260,17 +274,17 @@ if (!fs.existsSync(out_file))
         sku,
         upc,
         image,
-        product_stars,
-        reviews_count,
-        product_url,
-        review_url
+        product_url
       };
     }, url);
-
-    const reviews = await grab_product_review(page, product["review_url"]);
+    // const product = { ...product_part1, ...product_part2 };
+    const reviews = await grab_product_review(
+      page,
+      product_part1["review_url"]
+    );
 
     for (let i = 0; i < reviews.length; i++) {
-      reviews[i] = { ...reviews[i], ...product };
+      reviews[i] = { ...reviews[i], ...product_part1, ...product_part2 };
     }
     await page.close();
     return reviews;
