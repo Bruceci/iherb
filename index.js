@@ -71,8 +71,9 @@ if (!fs.existsSync(out_file))
         let product_urls = await get_product_list_one_page(page, pager_urls[k]);
         for (let j = start_item; j < product_urls.length; j++) {
           console.log(`cate:${i} pager:${k} item:${j}`);
-          await page.waitFor(2000);
+          await page.waitFor(3000);
           while ((await browser.pages()).length > 7) {
+            console.log((await browser.pages()).length);
             await page.waitFor(5000);
           }
 
