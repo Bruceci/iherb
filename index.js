@@ -72,8 +72,11 @@ if (!fs.existsSync(out_file))
         for (let j = start_item; j < product_urls.length; j++) {
           console.log(`cate:${i} pager:${k} item:${j}`);
           await page.waitFor(3000);
-          while ((await browser.pages()).length > 7) {
-            console.log((await browser.pages()).length);
+          let page_count = (await browser.pages()).length;
+          console.log("out", page_count);
+          while (page_count > 7) {
+            page_count = (await browser.pages()).length;
+            console.log("in", page_count);
             await page.waitFor(5000);
           }
 
