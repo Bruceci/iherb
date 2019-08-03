@@ -59,7 +59,7 @@ if (!fs.existsSync(out_file))
 (async () => {
   async function main() {
     const { browser, page } = await require("./page");
-    await page_set(page);
+    // await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
@@ -104,7 +104,12 @@ if (!fs.existsSync(out_file))
     page.on("request", interceptedRequest => {
       if (
         interceptedRequest.url().endsWith(".png") ||
-        interceptedRequest.url().endsWith(".jpg")
+        interceptedRequest.url().endsWith(".jpg") ||
+        interceptedRequest
+          .url()
+          .search(
+            /google\.com|googleadservices\.com|google-analytics\.com|googletagmanager\.com|facebook\.net|pinimg\.com|doubleclick/
+          ) != -1
       )
         interceptedRequest.abort();
       else interceptedRequest.continue();
@@ -173,7 +178,7 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
-    await page_set(page);
+    // await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 90005 });
     try {
