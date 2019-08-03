@@ -59,6 +59,7 @@ if (!fs.existsSync(out_file))
 (async () => {
   async function main() {
     const { browser, page } = await require("./page");
+    await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
     await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
@@ -188,6 +189,7 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
+    await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
     await page_set(page);
     try {
       await page.goto(url, { timeout: 90005 });
