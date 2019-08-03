@@ -305,7 +305,16 @@ if (!fs.existsSync(out_file))
   }
 
   async function grab_product_review(page, url) {
-    if (!url) return [];
+    if (!url)
+      return [
+        {
+          title: "",
+          posted_date: "",
+          review_stars: "",
+          review_text: "",
+          helpful: ""
+        }
+      ];
     try {
       await page.goto(url, { timeout: 90007 });
     } catch (ex) {
