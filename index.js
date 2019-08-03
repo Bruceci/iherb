@@ -73,7 +73,7 @@ if (!fs.existsSync(out_file))
           console.log(`cate:${i} pager:${k} item:${j}`);
           await page.waitFor(2000);
           while ((await browser.pages()).length > 7) {
-            await page.waitFor(2000);
+            await page.waitFor(5000);
           }
 
           grab_product_detail(browser, product_urls[j])
