@@ -191,9 +191,8 @@ if (!fs.existsSync(out_file))
         { timeout: 90006 }
       );
     } catch (ex) {
-      await page.close();
+      console.log("no review, pass to next...");
       console.log(url);
-      await grab_product_detail(browser, url);
     }
 
     const product = await page.evaluate(url => {
