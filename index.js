@@ -59,7 +59,7 @@ if (!fs.existsSync(out_file))
 (async () => {
   async function main() {
     const { browser, page } = await require("./page");
-    // await page_set(page);
+    await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
@@ -178,7 +178,7 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
-    // await page_set(page);
+    await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 90005 });
     try {
@@ -280,7 +280,7 @@ if (!fs.existsSync(out_file))
   async function grab_product_review(page, url) {
     if (!url) return [];
     try {
-      await page.goto(url, { timeout: 9007 });
+      await page.goto(url, { timeout: 90007 });
     } catch (ex) {
       console.log("review page time out error, reload");
       console.log(url);
