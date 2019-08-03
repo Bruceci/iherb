@@ -59,6 +59,7 @@ if (!fs.existsSync(out_file))
 (async () => {
   async function main() {
     const { browser, page } = await require("./page");
+    await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
@@ -71,8 +72,8 @@ if (!fs.existsSync(out_file))
         for (let j = start_item; j < product_urls.length; j++) {
           console.log(`cate:${i} pager:${k} item:${j}`);
           await page.waitFor(2000);
-          while ((await browser.pages()).length > 5) {
-            await page.waitFor(5000);
+          while ((await browser.pages()).length > 7) {
+            await page.waitFor(2000);
           }
 
           grab_product_detail(browser, product_urls[j])
@@ -92,6 +93,18 @@ if (!fs.existsSync(out_file))
     start_cate = 0;
 
     // await browser.close()
+  }
+
+  async function page_set(page) {
+    await page.setRequestInterception(true);
+    page.on("request", interceptedRequest => {
+      if (
+        interceptedRequest.url().endsWith(".png") ||
+        interceptedRequest.url().endsWith(".jpg")
+      )
+        interceptedRequest.abort();
+      else interceptedRequest.continue();
+    });
   }
 
   async function write_product_reviews(records) {
@@ -156,6 +169,7 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
+    await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { timeout: 200000 });
 
