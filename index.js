@@ -63,7 +63,7 @@ if (!fs.existsSync(out_file))
     await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
+    // await page.setViewport({ width: 1920, height: 1080 });
     const url = "https://www.iherb.com/";
     const cate_urls = await get_category_urls(page, url);
     for (let i = start_cate; i < cate_urls.length; i++) {
@@ -101,9 +101,6 @@ if (!fs.existsSync(out_file))
   }
 
   async function page_set(page) {
-    await page.waitForFunction(() => {
-      return typeof jQuery === "function";
-    });
     await page.setRequestInterception(true);
     page.on("request", interceptedRequest => {
       if (
@@ -130,6 +127,9 @@ if (!fs.existsSync(out_file))
 
   async function get_category_urls(page, url) {
     await page.goto(url, { timeout: 90003 });
+    await page.waitForFunction(() => {
+      return typeof jQuery === "function";
+    });
     await change_location(page);
     const urls = await page.evaluate(() => {
       return jQuery(".nav-item-list")
@@ -150,6 +150,9 @@ if (!fs.existsSync(out_file))
   async function get_product_list_one_page(page, url) {
     try {
       await page.goto(url, { timeout: 90004 });
+      await page.waitForFunction(() => {
+        return typeof jQuery === "function";
+      });
     } catch (ex) {
       console.log("get product list timeout reload");
       console.log(url);
@@ -169,7 +172,10 @@ if (!fs.existsSync(out_file))
     return urls;
   }
   async function get_product_pager(page, cate_url) {
-    await page.goto(cate_url);
+    await page.goto(cate_url, { timeout: 90009 });
+    await page.waitForFunction(() => {
+      return typeof jQuery === "function";
+    });
     const total = await page.evaluate(() => {
       return parseInt(
         jQuery(".pagination")
@@ -193,6 +199,9 @@ if (!fs.existsSync(out_file))
     await page_set(page);
     try {
       await page.goto(url, { timeout: 90005 });
+      await page.waitForFunction(() => {
+        return typeof jQuery === "function";
+      });
     } catch (ex) {
       console.log("product page timeout, close and reopen");
       await page.close();
@@ -321,6 +330,9 @@ if (!fs.existsSync(out_file))
     if (!url) return reviews;
     try {
       await page.goto(url, { timeout: 90007 });
+      await page.waitForFunction(() => {
+        return typeof jQuery === "function";
+      });
     } catch (ex) {
       console.log("review page time out error, reload");
       console.log(url);
