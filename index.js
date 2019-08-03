@@ -144,7 +144,14 @@ if (!fs.existsSync(out_file))
   }
 
   async function get_product_list_one_page(page, url) {
-    await page.goto(url, { timeout: 90004 });
+    try {
+      await page.goto(url, { timeout: 90004 });
+    } catch (ex) {
+      console.log("get product list timeout reload");
+      console.log(url);
+      await get_product_list_one_page(page, url);
+    }
+
     const urls = await page.evaluate(() => {
       return jQuery(".products")
         .children(".product")
@@ -180,7 +187,14 @@ if (!fs.existsSync(out_file))
     const page = await browser.newPage();
     await page_set(page);
     await page.setViewport({ width: 1920, height: 1080 });
-    await page.goto(url, { timeout: 90005 });
+    try {
+      await page.goto(url, { timeout: 90005 });
+    } catch (ex) {
+      console.log("product page timeout, close and reopen");
+      await page.close();
+      await grab_product_detail(browser, url);
+    }
+
     let has_review = true;
     try {
       await page.waitForFunction(
