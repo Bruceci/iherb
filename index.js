@@ -75,7 +75,7 @@ if (!fs.existsSync(out_file))
           await page.waitFor(3000);
           let page_count = (await browser.pages()).length;
           console.log("out", page_count);
-          while (page_count > 7) {
+          while (page_count > 15) {
             page_count = (await browser.pages()).length;
             console.log("in", page_count);
             await page.waitFor(5000);
