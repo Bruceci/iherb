@@ -59,7 +59,7 @@ if (!fs.existsSync(out_file))
 (async () => {
   async function main() {
     const { browser, page } = await require("./page");
-    await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
+    // await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
     await page_set(page);
     // const wb = await get_workbook(out_file);
     // const page2 = await browser.newPage();
@@ -195,7 +195,7 @@ if (!fs.existsSync(out_file))
 
   async function grab_product_detail(browser, url) {
     const page = await browser.newPage();
-    await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
+    // await page.authenticate({ username: "yA5YQm", password: "kMM7qR" });
     await page_set(page);
     try {
       await page.goto(url, { timeout: 90005 });
@@ -338,6 +338,15 @@ if (!fs.existsSync(out_file))
       console.log(url);
       await grab_product_review(page, url);
     }
+    await page.waitForFunction(
+      () => {
+        return (
+          jQuery("div.empty-reviews-section").length ||
+          jQuery(".reviews-list").length
+        );
+      },
+      { timout: 90010 }
+    );
     const empty_review = await page.evaluate(() => {
       return jQuery("div.empty-reviews-section").length;
     });
